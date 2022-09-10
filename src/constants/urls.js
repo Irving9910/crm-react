@@ -1,4 +1,5 @@
-const serverUrl ="http://localhost:4000";
+
+const serverUrl = import.meta.env.VITE_API_URL;
 
 const urls = {
   clientsPath: `${serverUrl}/clients`,
