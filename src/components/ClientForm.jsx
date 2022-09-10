@@ -1,40 +1,75 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import Alert from "./Alert";
+import Urls from "../constants/urls";
+import Spinner from "./Spinner";
 
-const ClientForm = () => {
+const ClientForm = ({ client, loading }) => {
+  const navigate = useNavigate();
+
   const newClientSchema = Yup.object().shape({
     name: Yup.string().min(3).max(50).required(),
     company: Yup.string().required(),
     email: Yup.string().email().required(),
-    phone: Yup.number().positive('Number is not valid').integer('Number is not valid').typeError('Number is not valid')
+    phone: Yup.number()
+      .positive("Number is not valid")
+      .integer("Number is not valid")
+      .typeError("Number is not valid"),
   });
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleSubmit = async (values) => {
+    try {
+      let response;
+      const { clientsPath } = Urls;
+      if (client.id) {
+        response = await fetch(`${clientsPath}/${client.id}`, {
+          method: "PUT",
+          body: JSON.stringify(values),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        response = await fetch(clientsPath, {
+          method: "POST",
+          body: JSON.stringify(values),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+      await response.json();
+      navigate("/clients");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  return (
+  return loading ? (
+    <Spinner />
+  ) : (
     <div className="bg-white shadow-lg mt-10 px-5 py-10 rounded-lg md:w-3/4 mx-auto">
       <h1 className="text-gray-600 font-bold text-2xl uppercase text-center">
-        Client information
+        {client?.name ? "Edit client information" : "Client information"}
       </h1>
       <Formik
         initialValues={{
-          name: "",
-          company: "",
-          email: "",
-          phone: "",
-          notes: "",
+          name: client?.name ?? "",
+          company: client?.company ?? "",
+          email: client?.email ?? "",
+          phone: client?.phone ?? "",
+          notes: client?.notes ?? "",
         }}
-        onSubmit={(values) => {
+        enableReinitialize={true}
+        onSubmit={async (values, { resetForm }) => {
           handleSubmit(values);
+          resetForm();
         }}
         validationSchema={newClientSchema}
       >
         {({ errors, touched }) => {
-          // console.log(data);
           return (
             <Form className="mt-10">
               <div className="mb-4">
@@ -63,7 +98,7 @@ const ClientForm = () => {
                   placeholder="Client's company"
                   name="company"
                 />
-                 {errors.company && touched.company ? (
+                {errors.company && touched.company ? (
                   <Alert>{errors.company}</Alert>
                 ) : null}
               </div>
@@ -78,7 +113,7 @@ const ClientForm = () => {
                   placeholder="Client's e-mail"
                   name="email"
                 />
-                 {errors.email && touched.email ? (
+                {errors.email && touched.email ? (
                   <Alert>{errors.email}</Alert>
                 ) : null}
               </div>
@@ -93,7 +128,7 @@ const ClientForm = () => {
                   placeholder="Client's phone"
                   name="phone"
                 />
-                 {errors.phone && touched.phone ? (
+                {errors.phone && touched.phone ? (
                   <Alert>{errors.phone}</Alert>
                 ) : null}
               </div>
@@ -109,15 +144,15 @@ const ClientForm = () => {
                   placeholder="Client notes"
                   name="notes"
                 />
-                 {errors.notes && touched.notes ? (
+                {errors.notes && touched.notes ? (
                   <Alert>{errors.notes}</Alert>
                 ) : null}
               </div>
 
               <input
                 type="submit"
-                value="Save"
-                className="mt-5 w-full bg-blue-800 p-3 text-white uppercase font-bold text-lg"
+                value={client?.name ? "Edit client" : "Add client"}
+                className="mt-5 w-full bg-blue-800 p-3 text-white uppercase font-bold text-lg cursor-pointer"
               />
             </Form>
           );
@@ -125,6 +160,17 @@ const ClientForm = () => {
       </Formik>
     </div>
   );
+};
+
+ClientForm.defaultProps = {
+  client: {
+    name: "",
+    company: "",
+    email: "",
+    phone: "",
+    notes: "",
+  },
+  loading: false,
 };
 
 export default ClientForm;

@@ -1,4 +1,12 @@
 {
-    "clients": [
-    ]
+  "clients": [
+    {
+      "name": "Karen",
+      "company": "Apex",
+      "email": "karen@mail.com",
+      "phone": "3316218354",
+      "notes": "",
+      "id": 2
+    }
+  ]
 }
