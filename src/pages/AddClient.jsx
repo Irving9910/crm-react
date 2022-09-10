@@ -1,5 +1,5 @@
 import React from "react";
-import Form from "../components/Form";
+import ClientForm from "../components/ClientForm";
 
 const AddClient = () => {
   return (
@@ -10,7 +10,7 @@ const AddClient = () => {
       <p className="mt-3 text-center font-medium text-xl">
         Fill the form to register a new client
       </p>
-      <Form />
+      <ClientForm />
     </>
   );
 };

@@ -30,7 +30,7 @@ const Layout = () => {
           </Link>
         </nav>
       </div>
-      <div className="md:w-3/4 p-10 bg-blue-50">
+      <div className="md:w-3/4 p-10 bg-blue-50 md:h-screen overflow-y-auto">
         <Outlet />
       </div>
     </div>
